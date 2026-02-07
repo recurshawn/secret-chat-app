@@ -7,7 +7,7 @@
 - [x] Task: Conductor - User Manual Verification 'Infrastructure & Socket Setup' (Protocol in workflow.md)
 
 ## Phase 2: Entrance & UI Layout
-- [ ] Task: Implement the "Entrance" screen with Terminal theme.
+- [~] Task: Implement the "Entrance" screen with Terminal theme.
     - [ ] Create UI for name and room code input.
     - [ ] Implement responsive layout using Tailwind CSS.
 - [ ] Task: Conductor - User Manual Verification 'Entrance & UI Layout' (Protocol in workflow.md)
