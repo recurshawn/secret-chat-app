@@ -1,7 +1,7 @@
 # Implementation Plan: Terminal Chat MVP
 
 ## Phase 1: Infrastructure & Socket Setup
-- [ ] Task: Set up Socket.io server and client integration.
+- [~] Task: Set up Socket.io server and client integration.
     - [ ] Install dependencies (`socket.io`, `socket.io-client`).
     - [ ] Create a basic custom server or API route for socket handling.
 - [ ] Task: Conductor - User Manual Verification 'Infrastructure & Socket Setup' (Protocol in workflow.md)
