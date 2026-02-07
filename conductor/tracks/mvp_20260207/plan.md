@@ -6,11 +6,11 @@
     - [x] Create a basic custom server or API route for socket handling.
 - [x] Task: Conductor - User Manual Verification 'Infrastructure & Socket Setup' (Protocol in workflow.md)
 
-## Phase 2: Entrance & UI Layout
+## Phase 2: Entrance & UI Layout [checkpoint: 91d2176]
 - [x] Task: Implement the "Entrance" screen with Terminal theme. 47c5d33
     - [x] Create UI for name and room code input.
     - [x] Implement responsive layout using Tailwind CSS.
-- [ ] Task: Conductor - User Manual Verification 'Entrance & UI Layout' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Entrance & UI Layout' (Protocol in workflow.md)
 
 ## Phase 3: Chat Logic & Persistence
 - [ ] Task: Implement real-time room communication.
