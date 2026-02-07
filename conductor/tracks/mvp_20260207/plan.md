@@ -12,11 +12,11 @@
     - [x] Implement responsive layout using Tailwind CSS.
 - [x] Task: Conductor - User Manual Verification 'Entrance & UI Layout' (Protocol in workflow.md)
 
-## Phase 3: Chat Logic & Persistence
-- [ ] Task: Implement real-time room communication.
-    - [ ] Handle room joining and message broadcasting on the socket.
-    - [ ] Implement message display for text, URLs, and images.
-- [ ] Task: Implement LocalStorage persistence and Self-Destruct.
-    - [ ] Save messages to LocalStorage on receive.
-    - [ ] Add "Self-Destruct" button to clear LocalStorage and current chat view.
+## Phase 3: Chat Logic & Persistence [checkpoint: pending]
+- [x] Task: Implement real-time room communication.
+    - [x] Handle room joining and message broadcasting on the socket.
+    - [x] Implement message display for text, URLs, and images.
+- [x] Task: Implement LocalStorage persistence and Self-Destruct.
+    - [x] Save messages to LocalStorage on receive.
+    - [x] Add "Self-Destruct" button to clear LocalStorage and current chat view.
 - [ ] Task: Conductor - User Manual Verification 'Chat Logic & Persistence' (Protocol in workflow.md)
