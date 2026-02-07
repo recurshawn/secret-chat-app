@@ -12,7 +12,7 @@
     - [x] Implement responsive layout using Tailwind CSS.
 - [x] Task: Conductor - User Manual Verification 'Entrance & UI Layout' (Protocol in workflow.md)
 
-## Phase 3: Chat Logic & Persistence [checkpoint: 1a27fb0]
+## Phase 3: Chat Logic & Persistence [checkpoint: 7f961e5]
 - [x] Task: Implement real-time room communication.
     - [x] Handle room joining and message broadcasting on the socket.
     - [x] Implement message display for text, URLs, and images.
