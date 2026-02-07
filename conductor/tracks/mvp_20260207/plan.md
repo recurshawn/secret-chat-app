@@ -23,4 +23,8 @@
     - [x] Add hidden file input and 'IMG' button.
     - [x] Convert uploaded images to Base64 and broadcast.
     - [x] Auto-linkify URLs in text messages.
+- [x] Task: Implement Room URL Routing.
+    - [x] Create dynamic route `/room/[id]` to handle specific rooms.
+    - [x] Update Entrance to accept optional initial room.
+    - [x] Redirect from Home to Room URL on join.
 - [x] Task: Conductor - User Manual Verification 'Chat Logic & Persistence' (Protocol in workflow.md)

@@ -4,11 +4,12 @@ import React, { useState } from 'react';
 
 interface EntranceProps {
   onJoin: (data: { name: string; room: string }) => void;
+  initialRoom?: string;
 }
 
-export default function Entrance({ onJoin }: EntranceProps) {
+export default function Entrance({ onJoin, initialRoom = '' }: EntranceProps) {
   const [name, setName] = useState('');
-  const [room, setRoom] = useState('');
+  const [room, setRoom] = useState(initialRoom);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +38,7 @@ export default function Entrance({ onJoin }: EntranceProps) {
               className="bg-black border border-[#00FF00] p-2 focus:outline-none focus:ring-1 focus:ring-[#00FF00] text-[#00FF00]"
               required
               autoComplete="off"
+              autoFocus
             />
           </div>
 
@@ -49,9 +51,10 @@ export default function Entrance({ onJoin }: EntranceProps) {
               type="text"
               value={room}
               onChange={(e) => setRoom(e.target.value)}
-              className="bg-black border border-[#00FF00] p-2 focus:outline-none focus:ring-1 focus:ring-[#00FF00] text-[#00FF00]"
+              className={`bg-black border border-[#00FF00] p-2 focus:outline-none focus:ring-1 focus:ring-[#00FF00] text-[#00FF00] ${initialRoom ? 'opacity-50 cursor-not-allowed' : ''}`}
               required
               autoComplete="off"
+              readOnly={!!initialRoom}
             />
           </div>
 

@@ -1,28 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Entrance from './Entrance';
-import Chat from './Chat';
 
 export default function Home() {
-  const [session, setSession] = useState<{ name: string; room: string } | null>(null);
-
-  if (!session) {
-    return (
-      <Entrance 
-        onJoin={(data) => {
-          console.log('Joining session:', data);
-          setSession(data);
-        }} 
-      />
-    );
-  }
+  const router = useRouter();
 
   return (
-    <Chat 
-      name={session.name} 
-      room={session.room} 
-      onExit={() => setSession(null)} 
+    <Entrance 
+      onJoin={(data) => {
+        console.log('Redirecting to room:', data);
+        router.push(`/room/${encodeURIComponent(data.room)}?name=${encodeURIComponent(data.name)}`);
+      }} 
     />
   );
 }
