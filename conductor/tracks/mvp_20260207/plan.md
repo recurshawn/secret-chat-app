@@ -19,4 +19,4 @@
 - [x] Task: Implement LocalStorage persistence and Self-Destruct.
     - [x] Save messages to LocalStorage on receive.
     - [x] Add "Self-Destruct" button to clear LocalStorage and current chat view.
-- [ ] Task: Conductor - User Manual Verification 'Chat Logic & Persistence' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Chat Logic & Persistence' (Protocol in workflow.md)
