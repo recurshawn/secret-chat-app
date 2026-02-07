@@ -1,0 +1,8 @@
+{
+  "track_id": "mvp_20260207",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-07T00:00:00Z",
+  "updated_at": "2026-02-07T00:00:00Z",
+  "description": "Build the core real-time terminal chat MVP with mobile-friendly responsive design, featuring socket-based rooms, local persistence, and self-destruct history clearing."
+}
