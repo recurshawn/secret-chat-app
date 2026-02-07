@@ -19,4 +19,8 @@
 - [x] Task: Implement LocalStorage persistence and Self-Destruct.
     - [x] Save messages to LocalStorage on receive.
     - [x] Add "Self-Destruct" button to clear LocalStorage and current chat view.
+- [x] Task: Implement Image Upload and URL Linking.
+    - [x] Add hidden file input and 'IMG' button.
+    - [x] Convert uploaded images to Base64 and broadcast.
+    - [x] Auto-linkify URLs in text messages.
 - [x] Task: Conductor - User Manual Verification 'Chat Logic & Persistence' (Protocol in workflow.md)

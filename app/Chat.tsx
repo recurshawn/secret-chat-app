@@ -12,9 +12,10 @@ interface ChatProps {
 interface Message {
   id: string;
   sender: string;
-  text: string;
+  text?: string;
+  imageUrl?: string;
   timestamp: number;
-  type: 'text'; // Future proofing for images
+  type: 'text' | 'image';
 }
 
 export default function Chat({ name, room, onExit }: ChatProps) {
@@ -22,6 +23,7 @@ export default function Chat({ name, room, onExit }: ChatProps) {
   const [input, setInput] = useState('');
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize Socket and Load History
   useEffect(() => {
@@ -81,10 +83,6 @@ export default function Chat({ name, room, onExit }: ChatProps) {
       type: 'text',
     };
 
-    // Emit to server
-    // Note: Server implementation in lib/socket-handler.mts uses io.to(room).emit
-    // This means the server will broadcast to EVERYONE including the sender.
-    // So we don't add it to state here; we wait for 'receive-message'.
     socketRef.current.emit('send-message', {
       room,
       message: newMessage,
@@ -94,6 +92,39 @@ export default function Chat({ name, room, onExit }: ChatProps) {
     setInput('');
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !socketRef.current) return;
+
+    // Limit file size (e.g., 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert("File too large. Limit is 2MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const base64 = ev.target?.result as string;
+      const newMessage: Message = {
+        id: crypto.randomUUID(),
+        sender: name,
+        imageUrl: base64,
+        timestamp: Date.now(),
+        type: 'image',
+      };
+
+      socketRef.current?.emit('send-message', {
+        room,
+        message: newMessage,
+        sender: name,
+      });
+    };
+    reader.readAsDataURL(file);
+    
+    // Reset input
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handleSelfDestruct = () => {
     if (confirm('WARNING: This will permanently delete local chat history for this room. Proceed?')) {
       const storageKey = `chat_history_${room}`;
@@ -101,6 +132,46 @@ export default function Chat({ name, room, onExit }: ChatProps) {
       setMessages([]);
       onExit();
     }
+  };
+
+  const renderMessageContent = (msg: Message) => {
+    if (msg.type === 'image' && msg.imageUrl) {
+      return (
+        <img 
+          src={msg.imageUrl} 
+          alt="Transmitted Data" 
+          className="max-w-full h-auto border border-[#00FF00] opacity-80 hover:opacity-100 transition-opacity" 
+        />
+      );
+    }
+
+    if (msg.text) {
+      // Basic URL regex
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const parts = msg.text.split(urlRegex);
+
+      return (
+        <p className="whitespace-pre-wrap break-words">
+          {parts.map((part, i) => 
+            urlRegex.test(part) ? (
+              <a 
+                key={i} 
+                href={part} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="underline text-[#00AA00] hover:text-[#00FF00]"
+              >
+                {part}
+              </a>
+            ) : (
+              part
+            )
+          )}
+        </p>
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -138,7 +209,7 @@ export default function Chat({ name, room, onExit }: ChatProps) {
                   {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
-              <p className="whitespace-pre-wrap break-words">{msg.text}</p>
+              {renderMessageContent(msg)}
             </div>
           </div>
         ))}
@@ -146,24 +217,42 @@ export default function Chat({ name, room, onExit }: ChatProps) {
       </div>
 
       {/* Input Area */}
-      <form onSubmit={handleSendMessage} className="flex gap-2">
-        <span className="py-3 pl-2">&gt;</span>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Enter encrypted message..."
-          className="flex-1 bg-black border border-[#00FF00] p-3 focus:outline-none focus:ring-1 focus:ring-[#00FF00] text-[#00FF00] placeholder-gray-700"
-          autoFocus
+      <div className="flex gap-2 items-center">
+        <input 
+          type="file" 
+          accept="image/*" 
+          className="hidden" 
+          ref={fileInputRef}
+          onChange={handleFileUpload}
         />
         <button
-          type="submit"
-          disabled={!input.trim()}
-          className="bg-[#00FF00] text-black font-bold px-6 hover:bg-[#00CC00] disabled:opacity-50 disabled:hover:bg-[#00FF00]"
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="border border-[#00FF00] px-3 py-3 hover:bg-[#003300] text-sm"
+          title="Upload Image"
         >
-          SEND
+          IMG
         </button>
-      </form>
+
+        <form onSubmit={handleSendMessage} className="flex-1 flex gap-2">
+          <span className="py-3 pl-2">&gt;</span>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Enter encrypted message..."
+            className="flex-1 bg-black border border-[#00FF00] p-3 focus:outline-none focus:ring-1 focus:ring-[#00FF00] text-[#00FF00] placeholder-gray-700"
+            autoFocus
+          />
+          <button
+            type="submit"
+            disabled={!input.trim()}
+            className="bg-[#00FF00] text-black font-bold px-6 hover:bg-[#00CC00] disabled:opacity-50 disabled:hover:bg-[#00FF00]"
+          >
+            SEND
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

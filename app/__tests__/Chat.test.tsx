@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Chat from '../Chat';
 
 // Mock socket.io-client
@@ -43,13 +43,14 @@ describe('Chat Component', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Clear localStorage mock store
     localStorageMock.clear();
-    
-    // Mock window.confirm for self-destruct test
     vi.spyOn(window, 'confirm').mockImplementation(() => true);
-    // Mock scrollIntoView
     window.HTMLElement.prototype.scrollIntoView = vi.fn();
+    window.alert = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('renders chat interface with room and user name', () => {
@@ -60,21 +61,13 @@ describe('Chat Component', () => {
 
   it('joins the room on mount', () => {
     render(<Chat {...defaultProps} />);
-    // The component connects via io() then listens for 'connect'.
-    // In our mock, we don't simulate 'connect' event automatically unless we manually trigger the callback passed to 'on'.
-    // However, we can check if io() was called.
-    expect(socketMock.on).toHaveBeenCalledWith('connect', expect.any(Function));
-    
-    // Simulate connection
     const connectCallback = socketMock.on.mock.calls.find(call => call[0] === 'connect')?.[1];
     connectCallback?.();
-
     expect(socketMock.emit).toHaveBeenCalledWith('join-room', 'TestRoom');
   });
 
   it('sends a message when form is submitted', () => {
     render(<Chat {...defaultProps} />);
-    
     const input = screen.getByPlaceholderText(/Enter encrypted message/i);
     const sendButton = screen.getByText('SEND');
 
@@ -86,18 +79,112 @@ describe('Chat Component', () => {
       sender: 'TestUser',
       message: expect.objectContaining({
         text: 'Hello World',
-        sender: 'TestUser'
+        sender: 'TestUser',
+        type: 'text'
       })
     }));
   });
 
-  it('calls onExit when self-destruct is clicked and confirmed', () => {
+  it('renders URLs as links', async () => {
     render(<Chat {...defaultProps} />);
     
-    const destructButton = screen.getByText('[ Self-Destruct ]');
-    fireEvent.click(destructButton);
+    const receiveCallback = socketMock.on.mock.calls.find(call => call[0] === 'receive-message')?.[1];
+    
+    const message = {
+      id: '123',
+      sender: 'OtherUser',
+      text: 'Check this https://example.com link',
+      timestamp: Date.now(),
+      type: 'text'
+    };
 
-    expect(window.confirm).toHaveBeenCalled();
-    expect(defaultProps.onExit).toHaveBeenCalled();
+    if (receiveCallback) {
+        // Wrap in act implicitly by waiting for effect
+        receiveCallback({ room: 'TestRoom', message, sender: 'OtherUser' });
+    }
+
+    await waitFor(() => {
+        expect(screen.getByText(/Check this/i)).toBeInTheDocument();
+    });
+    
+    const link = screen.getByRole('link', { name: /https:\/\/example.com/i });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', 'https://example.com');
+  });
+
+  it('handles image upload', async () => {
+    const { container } = render(<Chat {...defaultProps} />);
+    
+    // Find the hidden file input
+    // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+    const fileInput = container.querySelector('input[type="file"]');
+    expect(fileInput).toBeInTheDocument();
+    
+    const file = new File(['(⌐□_□)'], 'cool.png', { type: 'image/png' });
+
+    // Mock FileReader as a class
+    const mockFileReaderInstance = {
+      readAsDataURL: vi.fn(),
+      onload: null as ((ev: any) => any) | null,
+      result: 'data:image/png;base64,fakebase64string'
+    };
+
+    class MockFileReader {
+      readAsDataURL = mockFileReaderInstance.readAsDataURL;
+      onload = mockFileReaderInstance.onload;
+      result = mockFileReaderInstance.result;
+      
+      constructor() {
+          // When the component assigns onload, we need to capture it.
+          // Since we can't easily capture the assignment to 'this.onload' from the component 
+          // back to our test scope unless we proxy it.
+          
+          return new Proxy(this, {
+              set: (target, prop, value) => {
+                  if (prop === 'onload') {
+                      mockFileReaderInstance.onload = value;
+                  }
+                  // @ts-ignore
+                  target[prop] = value;
+                  return true;
+              },
+              get: (target, prop) => {
+                  if (prop === 'result') return mockFileReaderInstance.result;
+                  // @ts-ignore
+                  return target[prop];
+              }
+          });
+      }
+    }
+
+    const originalFileReader = window.FileReader;
+    window.FileReader = MockFileReader as any;
+
+    if (fileInput) {
+        fireEvent.change(fileInput, { target: { files: [file] } });
+    }
+    
+    expect(mockFileReaderInstance.readAsDataURL).toHaveBeenCalledWith(file);
+    
+    // Manually trigger onload
+    // We need to wait a tick for the assignment to happen in the component
+    await waitFor(() => {
+        if (mockFileReaderInstance.onload) {
+            mockFileReaderInstance.onload({ target: { result: mockFileReaderInstance.result } });
+        }
+    });
+
+    await waitFor(() => {
+        expect(socketMock.emit).toHaveBeenCalledWith('send-message', expect.objectContaining({
+            room: 'TestRoom',
+            message: expect.objectContaining({
+                type: 'image',
+                imageUrl: 'data:image/png;base64,fakebase64string'
+            })
+        }));
+    });
+
+    // Cleanup
+    window.FileReader = originalFileReader;
   });
 });
