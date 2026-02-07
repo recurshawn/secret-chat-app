@@ -12,19 +12,13 @@
     - [x] Implement responsive layout using Tailwind CSS.
 - [x] Task: Conductor - User Manual Verification 'Entrance & UI Layout' (Protocol in workflow.md)
 
-## Phase 3: Chat Logic & Persistence [checkpoint: 7f961e5]
-- [x] Task: Implement real-time room communication.
-    - [x] Handle room joining and message broadcasting on the socket.
-    - [x] Implement message display for text, URLs, and images.
-- [x] Task: Implement LocalStorage persistence and Self-Destruct.
-    - [x] Save messages to LocalStorage on receive.
-    - [x] Add "Self-Destruct" button to clear LocalStorage and current chat view.
-- [x] Task: Implement Image Upload and URL Linking.
-    - [x] Add hidden file input and 'IMG' button.
-    - [x] Convert uploaded images to Base64 and broadcast.
-    - [x] Auto-linkify URLs in text messages.
-- [x] Task: Implement Room URL Routing.
-    - [x] Create dynamic route `/room/[id]` to handle specific rooms.
-    - [x] Update Entrance to accept optional initial room.
-    - [x] Redirect from Home to Room URL on join.
+## Phase 3: Chat Logic & Persistence [checkpoint: aca18d1]
+...
 - [x] Task: Conductor - User Manual Verification 'Chat Logic & Persistence' (Protocol in workflow.md)
+
+## Phase 4: Deployment
+- [x] Task: Prepare for persistent server deployment (Render).
+    - [x] Create `render.yaml` for infrastructure as code.
+    - [x] Update project to support standard Node.js process environment.
+- [ ] Task: Deploy to Render and verify WebSocket connectivity.
+
