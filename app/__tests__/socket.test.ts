@@ -3,7 +3,7 @@ import { io as ClientIO, Socket as ClientSocket } from 'socket.io-client';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { AddressInfo } from 'net';
-import { setupSocketHandlers } from '../../lib/socket-handler';
+import { setupSocketHandlers } from '../../lib/socket-handler.mjs';
 
 describe('Socket.io Integration', () => {
   let io: Server, clientSocket: ClientSocket, port: number;
